@@ -1,0 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+@plugin "daisyui";
+
+body {
+  font-family: "Inter", sans-serif;
+  background: #111827;
+  color: #f3f4f6;
+}
+
+@theme {
+  --primary: #6366f1;
+  --secondary: #14b8a6;
+  --accent: #ef4444;
+  --neutral: #1e293b;
+  --base-100: #111827;
+  --base-200: #1e293b;
+  --base-300: #4b5563;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
