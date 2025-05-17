@@ -17,11 +17,14 @@ const useGetMessages = () => {
     const fetchMessages = async () => {
       try {
         dispatch(setMessages([]));
-        axios.defaults.withCredentials = true;
 
         const url = `${API_BASE_URL}/api/v1/message/${selectedUser._id}`;
-        const res = await axios.get(url);
-        
+        const res = await axios.get(url, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         dispatch(setMessages(res.data.data || []));
       } 
       catch (error) {

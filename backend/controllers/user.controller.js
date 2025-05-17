@@ -16,7 +16,8 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: 'Passwords do not match.', success: false });
     }
 
-    const user = await User.findOne({ username });
+    const normalizedUsername = username.toLowerCase();
+    const user = await User.findOne({ username: normalizedUsername });
     if (user) {
       return res.status(400).json({ message: 'Username already exists.', success: false });
     }
@@ -29,7 +30,7 @@ export const register = async (req, res) => {
 
     const newUser = await User.create({
       fullName,
-      username,
+      username: normalizedUsername,
       password: hashedPassword,
       profilePhoto: gender === 'male' ? maleProfilePhoto : femaleProfilePhoto,
       gender,
@@ -56,8 +57,9 @@ export const login = async (req, res) => {
     if (!username || !password) {
       return res.status(400).json({ message: 'Please fill all the fields.', success: false });
     }
-
-    const user = await User.findOne({ username });
+    
+    const normalizedUsername = username.toLowerCase();
+    const user = await User.findOne({ username: normalizedUsername });
     if (!user) {
       return res.status(400).json({ message: 'User not found.', success: false });
     }
@@ -71,10 +73,12 @@ export const login = async (req, res) => {
     const token = await jwt.sign(tokenData, process.env.JWT_SECRET, { expiresIn: '1d' });
     return res
       .status(200)
-      .cookie('token', token, {
+      .cookie('jwt', token, {
         httpOnly: true,
+        secure: true,
         maxAge: 1 * 24 * 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'None',
+        path: '/',
       })
       .json({
         message: 'Login successful.', success: true,
@@ -95,10 +99,12 @@ export const logout = async (req, res) => {
   try {
     return res
       .status(200)
-      .cookie('token', '', {
+      .cookie('jwt', '', {
         httpOnly: true,
+        secure: true,
+        sameSite: 'None',
         maxAge: 0,
-        sameSite: 'strict',
+        path: '/',
       })
       .json({ message: 'Logout successful.', success: true });
   } catch (error) {
@@ -138,8 +144,9 @@ export const updateUser = async (req, res) => {
       return res.status(400).json({ message: 'User not found.', success: false });
     }
 
-    if (username && username !== user.username) {
-      const existingUser = await User.findOne({ username });
+    const normalizedUsername = username ? username.toLowerCase() : user.username;
+    if (normalizedUsername && normalizedUsername !== user.username) {
+      const existingUser = await User.findOne({ username: normalizedUsername });
       if (existingUser) {
         return res.status(400).json({ message: 'Username already exists.', success: false });
       }
@@ -168,7 +175,7 @@ export const updateUser = async (req, res) => {
 
     // Update fields
     if (fullName) user.fullName = fullName;
-    if (username) user.username = username;
+    if (username) user.username = normalizedUsername;
     if (gender) user.gender = gender;
     if (password) {
       const salt = await bcrypt.genSalt(10);

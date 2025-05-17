@@ -37,7 +37,7 @@ export const sendMessage = async (req, res) => {
         if (receiverSocketId) {
             io.to(receiverSocketId).emit('newMessage', newMessage)
         } else {
-            console.log('Receiver not online:', receiverId);
+            // console.log('Receiver not online:', receiverId);
         }
 
         res.status(200).json({ success: true, message: 'Message sent successfully', newMessage });
