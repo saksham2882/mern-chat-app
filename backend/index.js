@@ -11,23 +11,13 @@ import cookieParser from "cookie-parser"
 connectDB()
 
 const PORT = process.env.PORT || 8080;
-
-const allowedOrigins = [
-    process.env.CLIENT_URL, "http://localhost:5173",
-];
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
+    origin: process.env.CLIENT_URL,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(express.static('public'));
 
